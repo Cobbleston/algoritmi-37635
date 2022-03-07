@@ -1,0 +1,1 @@
+public enum Habitat {City, Sea}

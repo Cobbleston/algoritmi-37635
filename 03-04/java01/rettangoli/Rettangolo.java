@@ -1,0 +1,19 @@
+package java01.rettangoli;
+
+public class Rettangolo {	
+	private int l;
+	private int h;
+
+	public Rettangolo(int l, int h) {
+		this.h = h;
+		this.l = l;
+	}
+	
+	public int getPerimetro(){
+		return (this.l+this.h)*2;
+	}
+	
+	public int getArea(){
+		return (this.l*this.h);
+	}
+}
