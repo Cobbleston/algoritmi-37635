@@ -1,0 +1,6 @@
+Compilare con librerie particolari
+javac -cp "../asdlab/src/" DemoDizionario.java
+
+Eseguire un programma
+java -cp "../asdlab/src/:." DemoDizionario
+
