@@ -32,7 +32,7 @@ public class DemoIterators {
 			System.out.println(string);
 		}
 		
-
+		scanner.close();
 	}
 
 }
