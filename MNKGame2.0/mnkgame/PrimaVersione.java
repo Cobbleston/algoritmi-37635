@@ -22,9 +22,12 @@
 
 package mnkgame;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
+
+import javax.sound.midi.SysexMessage;
 
 /**
  * Software player only a bit smarter than random.
@@ -38,6 +41,8 @@ public class PrimaVersione implements MNKPlayer {
 	private MNKBoard B;
 	private MNKGameState myWin;
 	private MNKGameState yourWin;
+	private MNKCellState myState;
+	private MNKCellState yourState;
 	private int TIMEOUT;
 
 	/**
@@ -50,8 +55,19 @@ public class PrimaVersione implements MNKPlayer {
 		// New random seed for each game
 		rand = new Random(System.currentTimeMillis());
 		B = new MNKBoard(M, N, K);
-		myWin = first ? MNKGameState.WINP1 : MNKGameState.WINP2;
-		yourWin = first ? MNKGameState.WINP2 : MNKGameState.WINP1;
+
+		if (first) {
+			myWin = MNKGameState.WINP1;
+			yourWin = MNKGameState.WINP2;
+			myState = MNKCellState.P1;
+			yourState = MNKCellState.P2;
+		}
+		else {
+			myWin = MNKGameState.WINP2;
+			yourWin = MNKGameState.WINP1;
+			myState = MNKCellState.P2;
+			yourState = MNKCellState.P1;
+		}
 		TIMEOUT = timeout_in_secs;
 	}
 
@@ -70,78 +86,95 @@ public class PrimaVersione implements MNKPlayer {
 			MNKCell c = MC[MC.length - 1]; // Recover the last move from MC
 			B.markCell(c.i, c.j); // Save the last move in the local MNKBoard
 		}
-		// If there is just one possible move, return immediately
-		if (FC.length == 1) {
-			return FC[0];
-		}
-		
+
 		MNKCell bestGuess = FC[0];
-		double bestValue = 0;
-		for (int k = 0; k < FC.length; k++) {
+		float bestValue = 0;
+		for (int k = 0; k < FC.length; k++) { // Prova tutte le possibili mosse
 			// If time is running out, return the best guess
-			if ((System.currentTimeMillis() - start) / 1000.0 > TIMEOUT * (99.0 / 100.0))
+			if ((System.currentTimeMillis() - start) / 1000.0 > TIMEOUT * (99.0 / 100.0)) {
+				B.markCell(bestGuess.i, bestGuess.j);
 				return bestGuess;
+			}
 			
 			MNKCell candidateCell = FC[k];
 			B.markCell(candidateCell.i, candidateCell.j);
 
-			if (bestValue < boardValue(B, MNKCellState.P2)) {
+			if (B.gameState() == myWin) {
+				return candidateCell;
+			}
+			
+			// Check for a 1 move loss
+			int pos   = rand.nextInt(FC.length);
+			MNKCell c = FC[pos]; // random move
+			B.markCell(c.i,c.j); // mark the random position	
+			for(int k2 = 0; k2 < FC.length; k2++) {
+			// If time is running out, return the randomly selected  cell
+      			if((System.currentTimeMillis()-start)/1000.0 > TIMEOUT*(99.0/100.0)) {
+					return c;
+				} else if(k2 != pos && FC[k2] != candidateCell) {     
+					MNKCell d = FC[k2];
+					if(B.markCell(d.i,d.j) == yourWin) {
+						B.unmarkCell();        // undo adversary move
+						B.unmarkCell();	       // undo my move	 
+						B.markCell(d.i,d.j);   // select his winning position
+						return d;							 // return his winning position
+					} else {
+						B.unmarkCell();	       // undo adversary move to try a new one
+					}
+			}	
+		}
+			
+
+			if (bestValue < boardValue()) {
 				bestGuess = candidateCell;
 			}
 
 			B.unmarkCell();
 		}
+
+		B.markCell(bestGuess.i, bestGuess.j);
+		System.out.println("Mossa scelta" + bestGuess.toString());
 		return bestGuess;
 	}
-
-	public double boardValue(MNKBoard board, MNKCellState player) {
-
-		int mieCelle = 0;
-		int i;
-		int j;
+	
+	// Conto in quanti modi posso vincere nella situazione attuale sommando gli slot dove posso vincere e sottraendo quelli dove vince lui
+	public float boardValue() {
+		int myCells = 0;
+		int hisCells = 0;
+		int freeCells = 0;
 		boolean finito;
-		LinkedList<Integer> L = new LinkedList<>();
-		double sum = 0;
+		float res = 0;
+		float[][] matrixSum = new float[B.M][B.N];
 
 		// Horizontal check
-		for (i = 0; i < board.M; i++) {								// Per ogni riga
-			for (int iCol = 0; iCol < board.N - board.K; iCol++) {		// Controllo ogni blocco di board.K celle
-				mieCelle = 0;
-				j = iCol;
+		for (int i = 0; i < B.M; i++) {
+			for (int jRig = 0; jRig < B.N; jRig++) {
+				myCells = 0;
+				hisCells = 0;
 				finito = false;
-				while (j < board.K && !finito) {						// Controllo i possibili shift
-					if (board.cellState(i, j) != player && board.cellState(i, j) != MNKCellState.FREE) {
-						finito = true;
-					} else if (board.cellState(i, j) == player) {
-						mieCelle++;
+				for (int j = jRig; j < B.N - B.K && !finito; j++) {
+					if (B.cellState(i, j) == myState) {
+						myCells++;
 					}
-					j++;
+					else if (B.cellState(i, j) == yourState) {
+						hisCells++;
+					}
+					else {
+						freeCells++;
+					}
 				}
-				System.out.println("Celle analizzate RigaxColonna:/t" + i + "/t" + j);
-				System.out.println("Risultato: " + (board.K - mieCelle));
-				sum += 1 / (board.K - mieCelle);
+				
+				res += (float) 1 / (B.K - myCells);
+				System.out.println(res);
 			}
 		}
+		
+		System.out.println(B.getMarkedCells()[B.getMarkedCells().length - 1]);
+		System.out.println(res);
+
 
 		// Vertical check
-		for (j = 0; j < board.N; j++) { // Per ogni colonna
-			for (int iRig = 0; iRig < board.M - board.K; iRig++) { // Controllo ogni blocco di board.K celle
-				mieCelle = 0;
-				i = iRig;
-				finito = false;
-				while (i < board.K && !finito) {						// Controllo i possibili shift
-					if (board.cellState(i, j) != player && board.cellState(i, j) != MNKCellState.FREE) {
-						finito = true;
-					} else if (board.cellState(i, j) == player) {
-						mieCelle++;
-					}
-					i++;
-				}
-				System.out.println("Celle analizzate RigaxColonna:/t" + i + "/t" + j);
-				System.out.println("Risultato: " + (board.K - mieCelle));
-				sum += 1 / (board.K - mieCelle);
-			}
-		}
+		// TO DO
 
 		// Diagonal check
 		// TO DO
@@ -149,8 +182,9 @@ public class PrimaVersione implements MNKPlayer {
 		// Anti-diagonal check
 		// TO DO
 
-		// Nel caso di problemi
-		return sum;
+		// Trovo cella con valore più alto
+
+		return res;
 	}
 
 	public String playerName() {
