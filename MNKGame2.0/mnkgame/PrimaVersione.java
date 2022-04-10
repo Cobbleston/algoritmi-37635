@@ -51,6 +51,12 @@ public class PrimaVersione implements MNKPlayer {
 	public PrimaVersione() {
 	}
 
+	public record Albero(
+		Albero parent,
+		LinkedList<Albero> children
+	) {
+	}
+
 	public void initPlayer(int M, int N, int K, boolean first, int timeout_in_secs) {
 		// New random seed for each game
 		rand = new Random(System.currentTimeMillis());
