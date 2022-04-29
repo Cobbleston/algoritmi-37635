@@ -113,22 +113,22 @@ public class PrimaVersione implements MNKPlayer {
 			int pos   = rand.nextInt(FC.length);
 			MNKCell c = FC[pos]; // random move
 			B.markCell(c.i,c.j); // mark the random position	
-			for(int k2 = 0; k2 < FC.length; k2++) {
-			// If time is running out, return the randomly selected  cell
-      			if((System.currentTimeMillis()-start)/1000.0 > TIMEOUT*(99.0/100.0)) {
+			for (int k2 = 0; k2 < FC.length; k2++) {
+				// If time is running out, return the randomly selected cell
+				if ((System.currentTimeMillis() - start) / 1000.0 > TIMEOUT * (99.0 / 100.0)) {
 					return c;
-				} else if(k2 != pos && FC[k2] != candidateCell) {     
+				} else if (k2 != pos && FC[k2] != candidateCell) {
 					MNKCell d = FC[k2];
-					if(B.markCell(d.i,d.j) == yourWin) {
-						B.unmarkCell();        // undo adversary move
-						B.unmarkCell();	       // undo my move	 
-						B.markCell(d.i,d.j);   // select his winning position
-						return d;							 // return his winning position
+					if (B.markCell(d.i, d.j) == yourWin) {
+						B.unmarkCell(); // undo adversary move
+						B.unmarkCell(); // undo my move
+						B.markCell(d.i, d.j); // select his winning position
+						return d; // return his winning position
 					} else {
-						B.unmarkCell();	       // undo adversary move to try a new one
+						B.unmarkCell(); // undo adversary move to try a new one
 					}
-			}	
-		}
+				}
+			}
 			
 
 			if (bestValue < boardValue()) {
