@@ -29,7 +29,9 @@ Differisce dal costo medio perchè **calcola la media del costo di una sequenza 
 ### Metodo dell'aggregazione
 Determiniamo un limite superiore al costo totale di una sequenza di $n$ operazioni e dividiamo per $n$
 
+### Esempio
         INSERIRE ESEMPIO
+---
 
 ### Metodo degli accantonamenti
 - Assegnamo un _costo ammortizzato_ ad ogni operazione
@@ -38,6 +40,7 @@ Determiniamo un limite superiore al costo totale di una sequenza di $n$ operazio
 - Se il costo reale è più alto, usiamo il credito
 - Il costo ammortizzato è corretto se il **credito non è mai negativo**
 
+### Esempio
         INSERIRE ESEMPIO
 
 
@@ -47,7 +50,9 @@ Determiniamo un limite superiore al costo totale di una sequenza di $n$ operazio
 
 Aproccio di tipo bruteforce, iteriamo fino a che non vediamo un pattern per il passo $i$ e da lì calcoliamo il costo in base a quando termina
 
+### Esempio
         INSERIRE ESEMPIO
+---
 
 ## Metodo della sostituzione
 
@@ -55,7 +60,9 @@ Usato per _validare_ un'ipotesi
 - Ipotizziamo una soluzione
 - Usiamo al definizione di $O, \Omega, \Theta$ per verificarla induttivamente
 
+### Esempio
         INSERIRE ESEMPIO
+---
 
 ## Metodo dell'albero di ricorsione
 
@@ -63,6 +70,10 @@ Usato per _validare_ un'ipotesi
 - Generiamo l'albero di ricorsione dall'equzione di ricorrenza
 - Calcoliamo il numero di nodi ad ogni livello dell'albero
 - Identifichiamo qualche schema ricorrente legato al livello dell'albero
+
+### Esempio
+        INSERIRE ESEMPIO
+---
 
 ## Master Theorem
 
@@ -72,5 +83,24 @@ $$ T(n) = aT(n/b) + f(n) \qquad \text{con }a \geq 1, b > 1 \text{ costanti e } f
 
 Si consideri la seguente equazione di ricorrenza
 
-$$ DA INSERIRE $$
+$$ f(n) = \begin{cases}
+        d                       & \text{if } n\text{ is even} \\ 
+        aT(n/b) + cn^\beta      & \text{if } n\text{ is odd} 
+\end{cases} $$
 
+dove $a \geq 1$, $b > 1$ e $c$, $d$ costanti. Sia $\alpha = \log_b a = \frac{\log_k a}{\log_k b}$. Allora
+
+- Se $\alpha > \beta$ allora $T(n) = \Theta(n^\alpha)$
+- Se $\alpha = \beta$ allora $T(n) = \Theta(n^\alpha \log n)$
+- Se $\alpha < \beta$ allora $T(n) = \Theta(n^\beta)$
+
+### Esempio
+        INSERIRE ESEMPIO
+
+# Strutture Dati Elementari
+
+Definisce _come_ i dati sono logicamente organizzati e le _operazioni_ per accedervi e modificarli, ma _non quali_ dati sono memorizzati
+
+## Dizionario
+
+...
