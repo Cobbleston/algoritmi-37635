@@ -319,7 +319,7 @@ Algoritmo ricorsivo per individuare la migliore mossa possibile in un gioco seco
 L'algoritmo è esatto quando è possibile visitare tutto il Game Tree
 
 ```
-function MiniMax(Tree T , bool playerA) → int
+function MiniMax(Tree T, bool playerA) → int
         if isLeaf(T) then
                 eval = evaluate(T)
         else if playerA == true then                            MAX player
@@ -346,7 +346,7 @@ Ottimizzazione dell'algoritmo MiniMax
 Non è necessario infatti visitare tutto l'albero
 
 ```
-function AlphaBeta(Tree T , bool playerA, int α, int β) → int
+function AlphaBeta(Tree T, bool playerA, int α, int β) → int
         if isLeaf(T) then
                 eval = evaluate(T)
         else if playerA == true then                            MAX player
@@ -372,7 +372,7 @@ Se il Game Tree è troppo grande limitiamo la ricerca ad un livello massimo di p
 
 In questo caso possiamo anche scegliere la mossa che ci porta alla vittoria prima
 ```
-function AlphaBetaDepth(Tree T , bool playerA, int α, int β, int depth) → int
+function AlphaBetaDepth(Tree T, bool playerA, int α, int β, int depth) → int
         if depth == 0 or isLeaf(T) then
                 eval = evaluate(T, depth)
         else if playerA == true then                            MAX player
@@ -394,7 +394,7 @@ function AlphaBetaDepth(Tree T , bool playerA, int α, int β, int depth) → in
 
 ## IterativeDeepening
 ```
-function IterativeDeepening(Tree T , bool playerA, int depth) → int
+function IterativeDeepening(Tree T, bool playerA, int depth) → int
         α = MinAlpha
         β = MaxBeta
         for d = 0, ..., depth do
@@ -414,3 +414,144 @@ In termini di tempo ha lo stesso costo di AlphaBeta pruning puro
 Molti stati di gioco compaiono più volte nell'albero, per velocizzare la ricerca possiamo individuarli e gestirli
 
 # Alberi Binari di Ricerca
+Anche chiamati BST (Binary Search Tree). Permettono una ricerca binaria sulla struttura Albero Binario
+
+Tutte le operazioni hanno un costo proporizionale all'altezza dell'albero
+
+Definizione Albero Binario di Ricerca:
+- Albero Binario
+- Ogni nodo `v` contiene una chiave e dati assocciati ad essa
+- Tutte le chiavi del sottoalbero sinistro di `v` sono $\leq$ `v.key` e tutte le chiavi del sottoalbero destro di `v` sono $\geq$ `v.key`
+
+Operazioni:
+- `search(T, k)`: ritorna il nodo con chiave `k` in `T`
+- `max(T)`: ritorna il nodo con chiave massima `k` in `T`
+- `min(T)`: ritorna il nodo con chiave minima `k` in `T`
+- `predecessor(T)`: ritorna il nodo che precede `T` quando i nodi sono ordinati rispetto ad una visita in ordine
+- `successor(T)`: simmetrica rispetto a `predecessor(T)`
+- `insert(T, k, d)`: inserisce un nodo con chiave `k` e dati `d` in `T`
+- `delete(T, k)`: rimuove il nodo con chiave `k` in `T`
+
+### Implementazione `insert`
+```
+function insert(BST T, Key k, Data d) → BST
+        N = new BST(k, d), P = NIL, S = T
+        while S != NIL do                       Search position
+                P = S
+                if k < S.key then
+                        S = S.left
+                else
+                        S = S.right
+        N.parent = P                            Insert node
+        if P != NIL and k < P.key then
+                P.left = N
+        else if P != NIL then
+                P.right = N
+        if T == NIL then return N else return T
+```
+### Implementazione `delete`
+```
+function delete(BST T, Key k) → BST                             Returns the (new) root
+        v = search(T, k)
+        if v != NIL then
+                if v.left == NIL or v.right == NIL then         (1-2) Foglia da rimuovere o ha un singolo figlio
+                        return deleteNode(T,v)
+                else                                            (3) Ha due figli
+                        u = predecessor(v)
+                        v = u                                   v.key = u.key and v.data = u.data
+                        return deleteNode(T, u)
+
+
+function deleteNode(BST T, BST v) → BST
+        p = v.parent
+        if p != NIL then                                                                v is not the root
+                if isLeaf(v) then                                                       (1) Foglia da rimuovere
+                        if p.left == v then p.left = NIL else p.right = NIL
+                else if v.right != NIL then                                             (2) Ha un singolo figlio
+                        if p.left == v then p.left = v.right else p.right = v.right
+                else if v.left != NIL then                                              (2) Ha un singolo figlio
+                        if p.left == v then p.left = v.left else p.right = v.left
+        else                                                                            v = T is the root
+                if isLeaf(v) then T = NIL                                               (1) Foglia da rimuovere
+                else if v.right != NIL then T = v.right                                 (2) Ha un singolo figlio
+                else if v.left != NIL then T = v.left                                   (2) Ha un singolo figlio
+        delete(v)
+        return T
+```
+
+
+|                   | `SEARCH`     | `INSERT` | `DELETE` |
+| ---               | ---          | ---      | ---      |
+| Array Ordinato    | $O(\log{n})$ | $O(n)$   | $O(n)$   |
+| Liste Concatenate | $O(n)$       | $O(1)$   | $O(n)$   |
+| Alberi BST        | $O(h)$       | $O(h)$   | $O(h)$   |
+
+Nota: $h = O(n)$
+
+# Alberi AVL
+Se riusciamo a mantenere un Albero Binario Bilanciato rispetto all'altezza le operazioni saranno più rapide
+
+Le operazioni `search`, `insert` e `delete` hanno costo $O(\log{n})$ nel caso pessimo con questa struttura dati, dobbiamo preoccuparci però di *mantenere l'albero bilanciato*
+
+```
+function update-height(AVL T)
+        if T != NIL then
+                nh = lh = rh = 0
+                if T.left != NIL then
+                        lh = T.left.height
+                if T.right != NIL then
+                        rh = T.right.height
+                if lh != 0 or rh != 0 then
+                        nh = max(lh, rh) + 1
+                T.height = nh
+
+function β(AVT T) → int
+        lh = rh = 0
+        if T.left != NIL then
+                lh = T.left.height
+        if T.right != NIL then
+                rh = T.right.height
+        return lh − rh
+```
+- Entrambe costano $O(1)$
+- `update-heigth` nel caso peggiore deve essere richiamata per tutti i nodi in un percorso radice-foglia
+- Possiamo interrompere l’aggiornamento se la nuova altezza non varia rispetto alla precedente
+
+## Rotazioni
+Un rotazione semplice serve per ribilanciare l'albero
+
+<img src="RotazioniAVL.png" alt="Rotazioni AVL">
+
+Preserva le proprietà di ordine dei BST
+
+### Rotazione a Destra 
+```
+function rotateDX(AVL T , AVL u) → AVL
+        if u != NIL and u.left != NIL then
+                v = u.left
+                v.parent = u.parent
+                u.parent = v
+                u.left = v.right
+                v.right = u
+                if v.parent == NIL then                v is the new root
+                        T = v
+                else                                    parent update
+                        if v.parent.left == u then
+                                v.parent.left = v
+                        else
+                                v.parent.right = v
+        return T
+```
+- Costo: $O(1)$
+- Ritorna la nuova radice dell'Albero AVL
+
+### Rotazione a Sinistra
+Simmetrica rispetto a `rotateDX`
+
+A seguito di un inserimento o di una rimozione possiamo avere l'albero sbilanciato in 4 modi diversi
+
+| SS                  | DD                  | SD                       | DS                        |
+| ---                 | ---                 | ---                      | ---                       |
+| Rotazione DX su `u` | Rotazione SX su `u` | Rotazione SX su `u.left` | Rotazione DX su `u.right` |
+|                     |                     | Rotazione DX su `u`      | Rotazione SX su `u`       |
+
