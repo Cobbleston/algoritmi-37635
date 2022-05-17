@@ -522,7 +522,7 @@ Un rotazione semplice serve per ribilanciare l'albero
 
 <img src="RotazioniAVL.png" alt="Rotazioni AVL">
 
-Preserva le proprietà di ordine dei BST
+Nota: Preserva le proprietà di ordine dei BST
 
 ### Rotazione a Destra 
 ```
@@ -548,10 +548,91 @@ function rotateDX(AVL T , AVL u) → AVL
 ### Rotazione a Sinistra
 Simmetrica rispetto a `rotateDX`
 
-A seguito di un inserimento o di una rimozione possiamo avere l'albero sbilanciato in 4 modi diversi
+A seguito di un inserimento o di una rimozione possiamo avere l'Albero sbilanciato in 4 modi diversi
 
 | SS                  | DD                  | SD                       | DS                        |
 | ---                 | ---                 | ---                      | ---                       |
 | Rotazione DX su `u` | Rotazione SX su `u` | Rotazione SX su `u.left` | Rotazione DX su `u.right` |
 |                     |                     | Rotazione DX su `u`      | Rotazione SX su `u`       |
 
+Quindi nel caso dell'**inserimento** di un nodo:
+- Si inserisce come per un Albero BST 
+  - Costo: $O(\log{n})$
+- Si riaggiornano le altezze dei sotto-alberi
+  - Costo: $O(\log{n})$
+- Se è sbilanciato ($\beta(u) > 1$ o $\beta(u) < -1$) si ribilancia l'Albero
+  - Costo: $O(1)$
+
+Quindi nel caso della **rimozione** di un nodo:
+- Si rimuove come per un Albero BST 
+  - Costo: $O(\log{n})$
+- Si riaggiornano le altezze dei sotto-alberi
+  - Costo: $O(\log{n})$
+- Se è sbilanciato ($\beta(u) > 1$ o $\beta(u) < -1$) si ribilancia l'Albero
+  - Costo: $O(1)$
+
+
+## Ricapitolando
+|                   | `SEARCH`     | `INSERT`     | `DELETE`     |
+| ---               | ---          | ---          | ---          |
+| Array Ordinato    | $O(\log{n})$ | $O(n)$       | $O(n)$       |
+| Liste Concatenate | $O(n)$       | $O(1)$       | $O(n)$       |
+| Alberi BST        | $O(h)$       | $O(h)$       | $O(h)$       |
+| Alberi AVL        | $O(\log{n})$ | $O(\log{n})$ | $O(\log{n})$ |
+
+# Tabelle Hash
+Struttura dati estremamente efficente per le operazioni basilari di un Dizionario
+
+L'idea alla base è quella di generalizzare l'indicizzazione di un array ordinario, rendendo il caso medio molto efficente
+
+Le tabelle ad indirizzamento diretto non sono efficenti in termini di memoria, infatti allcano un array per tutte le possibili chiavi che posso avere, se esse sono poche è utilizzabile, altrimenti non è accettabile
+
+Sia $U$ l'universo delle chiavi possibili
+
+Si usa quindi una *funzione hash* $h: U \rightarrow [0, \dots, m-1]$ su un array di dimensione $m = \Theta(|K|)$
+
+La funzione $h$ trasforma una chiave $k$ in un indice dell'array. Bisogna però evitare collisioni per quanto possibile e nel caso gestirle
+
+## Ridurre Collisioni
+
+Proprietà di uniformità semplice: ogni indice $i = h(k)$ deve essere generato con probabilità $1/m$
+
+### Metodo della divisione
+$$h(k) = k \mod m$$
+
+- Vantaggi: Molto efficente
+- Svantaggi: Suscettibile a valori specifici di $m$, potrebbe non usare tutto $k$
+
+### Metodo della moltiplicazione
+$$h(k) = \lfloor m(kC - \lfloor kC \rfloor ) \rfloor \qquad \qquad C \in ]0, 1[$$
+
+- Esempio:
+  - $m = 12, k = 101, C = 0.8 \Rightarrow h(k) = 9$
+- Vantaggi: Il valore di $m$ non è critico
+- Svantaggi: La costante $C$ influenza la proprietà di uniformità di $h$
+
+### Metodo della codifica algebrica
+$$h(k) = (k_n x^n + k_{n-1} x^{n-1} + \dots + k_1 x + k_0) \mod m \qquad \qquad k = k_n k_{n-1} \dots k_1 k_0$$
+
+- $k_i$ è l'$i$-esimo bit della rappresentazione per una qualche base di $k$, o il codice ascii dell'$i$-esimo carattere
+- $x$ è una costante
+- Esempio, usando la rappresentazione decimale
+  - $m = 12, k = 234, x = 3 \Rightarrow h(k) = (2 \times 3^2 + 3 \times 3 + 4) \mod 12 = 7$
+- Vantaggi: Dipende da *tutti* i caratteri/bit della chiave
+- Svantaggi: Molto costoso da calcolare
+
+### Regola di Horner
+$$p(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0 = a_0 + x(a_1 + x(a_2 + x( \dots x(a_{n-1} + a_n x))))$$
+
+Così facendo la funzione hash con la codifica algebrica ha da effettuare $n$ addizioni e $n$ moltiplicazioni, rendendo così il costo lineare
+
+## Gestire Collisioni
+Le collisioni non sono eliminabili totalmente, abbiamo due modi per gestirle
+
+### Concatenamento (chaining)
+
+        DA FARE
+
+### Indirizzamento aperto (open addressing)
+
+        DA FARE
