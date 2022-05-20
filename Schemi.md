@@ -630,9 +630,53 @@ Così facendo la funzione hash con la codifica algebrica ha da effettuare $n$ ad
 Le collisioni non sono eliminabili totalmente, abbiamo due modi per gestirle
 
 ### Concatenamento (chaining)
+Le chiavi $k$ con lo stesso valore hash $h(k) = i$ sono memorizzate in una lista concatenata (*lista di trabocco*)
 
-        DA FARE
+Sia $\alpha = n/m$ il *fattore di carico*, il rapporto tra il numero di elementi e la dimensione di una Tabella Hash
+
+Il costo medio di una ricerca con o senza successo è $\Theta (1 + \alpha)$
+
+Quindi se $n = O(m)$ allora $\alpha = O(1) \Rightarrow$ costo medio di ricerca $O(1)$ 
 
 ### Indirizzamento aperto (open addressing)
+Le chiavi sono tutte memorizzate nella stessa tabella, se uno slot è occupato si occupa il successivo libero
 
-        DA FARE
+La sequenza di ispezione
+$$ h(k, 0), h(k, 1), \dots , h(k, m-1),  $$
+deve fornire una *permutazione* degli indici della tabella
+
+Dobbiamo marcare i valori eliminati con `DELETED` invece di `NIL` per trattarli come slot pieni dalla ricerca
+
+`search`, `insert` e `delete` costano $O(m)$ con $m$ dimensione della tabella
+
+Nel caso medio invece dipende dalla strategia di ispezione
+
+### Ispezione lineare
+$$ h(k, i) = (h'(k) + i) \mod m $$
+Dove $h'(k)$ è una funzione hash ausiliaria
+
+Quando si ha una collisione si ispeziona l'indice successivo
+
+**Problema**: clustering primario
+- Lunghe sotto-sequenze occupate
+- Uno slot vuoto preceduto da $i$ slot pieni viene riempito con probabilità $(i+1)/m$
+- I tempi medi di inserimento e di cancellazione crescono
+
+### Ispezione quadratica
+$$ h(k, i) = (h'(k) + c_1 i + c_2 i^2) \mod m \qquad c_1 \neq c_2 $$
+dove $h'(k)$ è una funzione hash ausiliaria
+
+**Problema**: clustering secondario
+- Se due chiavi hanno la stessa ispezione iniziale, allora le loro sequenze di ispezione sono identiche
+
+### Doppio Hashing
+$$ h(k, i) = (h_1 (k) + i h_2 (k)) \mod m$$
+dove $h_1 (k), h_2(k)$ sono funzioni hash ausiliarie
+
+- Quando si ha una collisione, si usa la funzione secondaria e l'indice di ispezione per determinare il successivo slot da ispezionare
+  - Evita il clustering primario e secondario
+- La funzione $h_2$ non deve mai dare il valore hash $0$ e deve permettere di iterare su tutta la tabella
+
+### Caso medio Hash Table
+
+<img src="tableAverageWorstCost.png" alt="tableAverageWorstCost image">
