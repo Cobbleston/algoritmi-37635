@@ -677,6 +677,76 @@ dove $h_1 (k), h_2(k)$ sono funzioni hash ausiliarie
   - Evita il clustering primario e secondario
 - La funzione $h_2$ non deve mai dare il valore hash $0$ e deve permettere di iterare su tutta la tabella
 
+---
+
+Per l'indirizzamento aperto nel caso medio la complessità computazionale è $O(1)$
+
 ### Caso medio Hash Table
 
 <img src="tableAverageWorstCost.png" alt="tableAverageWorstCost image">
+
+### Fattore di carico
+
+Le prestazioni delle Tabelle Hash sono legate al *fattore di carico* $\alpha$. Se il fattore di carico supera una certa soglia si ridimensiona la tabella per mantenere alta l'efficacia
+
+# Ordinamento
+Definizioni:
+- **Ordinamento in loco**: l'algoritmo permuta gli elementi direttamente nell'array originale, senza usarne un'altro di appoggio
+- **Ordinamento stabile**: l'algoritmo preserva l'ordine con cui gli elementi con la stessa chiave compaiono nell'array originale
+
+## Selection Sort
+Cerca il minimo in `A[k+1 ... n]` e lo sposta in posizione `k+1`
+
+Costo: $\Theta(n^2)$
+
+## Insertion Sort
+Inserisce l'elemento `A[k+1]` nella posizione corretta all'interno del prefisso già ordinato `A[1 ... k]`
+
+Costo: $\Theta(n^2)$
+
+## Bubble Sort
+Esegue una serie di scansioni dell'array, ad ogni scansione porta l'elemento massimo nell'ultima posizione
+
+Ovvero
+
+Cerca il massimo in `A[1 ... k]` e lo sposta in posizione `k`
+
+Costo: $\Theta(n^2)$
+
+## Algoritmi divide et impera
+
+- Divide il problema in sottoproblemi più piccoli dello stesso tipo
+- Risolve i sottoproblemi ricorsivamente
+- Ricombina le soluzione per ottenere la soluzione al problema di partenza
+
+## Quick Sort
+- Scegli un elemento `x` del vettore `v`, e partiziona il vettore in due parti considerando gli elementi `≤ x` e quelli `> x`
+- Ordina ricorsivamente le due parti
+- Restituisci il risultato concatenando le due parti ordinate
+
+Per dividere l'array si usa `partition()`, che procede così:
+- Manteniamo due indici, `inf` e `sup`, che vengono fatti scorrere dalle estremità del vettore verso il centro
+  - Il sotto-vettore `A[i..inf-1]` è composto da elementi `≤ pivot`
+  - Il sotto-vettore `A[sup+1..f]` è composto da elementi `> pivot`
+- Quando entrambi (`inf` e `sup`) non possono essere fatti avanzare verso il centro, si scambia `A[inf]` e `A[sup]`
+
+<img src="partitionQuickSort.png" alt="partitionQuickSort">
+
+<img src="partitionQuickSort2.png" alt="partitionQuickSort2">
+
+Dopo che avrò risolto i sottoproblemi l'array sarà già ordinato, non ci sarà bisogno di fare la parte *impera*
+
+Il costo di QuickSort dipende da `partition()`, che nel caso peggiore ha costo $\Theta(n^2)$
+
+Nel caso medio però si ha costo $\Theta(n \log{n})$, cosa che lo rende molto più veloce rispetto agli algoritmi visti in precedenza
+
+Per avere sempre un caso medio possiamo scegliere in maniera pseudo-casuale il pivot
+
+## Merge Sort
+
+- Dividere A[] in due meta' A1[] e A2[]
+(senza permutare) di dimensioni uguali;
+- Applicare ricorsivamente Merge Sort a
+A1[] e A2[]
+- Fondere (merge) gli array ordinati A1[] e
+A2[] per ottenere l'array A[] ordinato
