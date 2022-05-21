@@ -1008,6 +1008,6 @@ Varie versioni:
 - Nel caso si trovi nella prima o nella seconda metà applico la ricorsione
 - Per il terzo caso cerco il sottovettore massimo adiacente ad `A[m]` sia a destra che a sinistra
 - Infine restituisco il massimo tra quelli che ho trovato per i tre casi
-- Costo: $O(n \log n$)
+- Costo: $O(n \log n)$
 
 # Greedy
