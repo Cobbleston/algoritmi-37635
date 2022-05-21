@@ -87,7 +87,7 @@ $$ f(n) = \begin{cases}
 dove $a \geq 1$, $b > 1$ e $c$, $d$ costanti. Sia $\alpha = \log_b{a} = \frac{\log_k{a}}{\log_k{b}}$. Allora
 
 - Se $\alpha > \beta$ allora $T(n) = \Theta(n^\alpha)$
-- Se $\alpha = \beta$ allora $T(n) = \Theta(n^\alpha \log{n})$
+- Se $\alpha = \beta$ allora $T(n) = \Theta(n^\alpha \log n)$
 - Se $\alpha < \beta$ allora $T(n) = \Theta(n^\beta)$
 
 ### Esempio
@@ -111,13 +111,13 @@ Idea: usiamo un array per salvare le coppie *(Key, Data)* e lo manteniamo ordina
 
 - `Search(Key k)`: Cerca la chiave $k$ con ricerca binaria
   - Ricerca binaria su array ordinato
-  - Costo: $O(\log{n})$
+  - Costo: $O(\log n)$
 - `Insert(Key k, Data d)`: Cerca con ricerca binaria, sposta in avanti tutte le coppie con chiavi $> k$
   - Ricerca binaria modificata, spostamento e inserimento
-  - Costo: $O(\log{n}) + O(n) + O(1) = O(n)$
+  - Costo: $O(\log n) + O(n) + O(1) = O(n)$
 - `Delete(Key k)`: Elimina la coppia $(k, d)$ dal Dizionario, cercandola con ricerca binaria
   - Ricerca binaria e spostamento
-  - Costo: $O(\log{n}) + O(n) = O(n)$
+  - Costo: $O(\log n) + O(n) = O(n)$
 
 ## Dizionario su Lista Concatenata
 Idea: lista concatenata non ordinata per memorizzare le coppie
@@ -135,7 +135,7 @@ Idea: lista concatenata non ordinata per memorizzare le coppie
 ### Confronto tra diverse implementazioni
 | Funzione | Array Ordinato | Lista Concatenata |
 | --- | --- | --- |
-| `Search` | $O(\log{n})$ | $O(n)$ |
+| `Search` | $O(\log n)$ | $O(n)$ |
 | `Insert` | $O(n)$ | $O(1)$ |
 | `Delete` | $O(n)$ | $O(n)$ |
 
@@ -482,7 +482,7 @@ function deleteNode(BST T, BST v) → BST
 
 |                   | `SEARCH`     | `INSERT` | `DELETE` |
 | ---               | ---          | ---      | ---      |
-| Array Ordinato    | $O(\log{n})$ | $O(n)$   | $O(n)$   |
+| Array Ordinato    | $O(\log n)$ | $O(n)$   | $O(n)$   |
 | Liste Concatenate | $O(n)$       | $O(1)$   | $O(n)$   |
 | Alberi BST        | $O(h)$       | $O(h)$   | $O(h)$   |
 
@@ -491,7 +491,7 @@ Nota: $h = O(n)$
 # Alberi AVL
 Se riusciamo a mantenere un Albero Binario Bilanciato rispetto all'altezza le operazioni saranno più rapide
 
-Le operazioni `search`, `insert` e `delete` hanno costo $O(\log{n})$ nel caso pessimo con questa struttura dati, dobbiamo preoccuparci però di *mantenere l'albero bilanciato*
+Le operazioni `search`, `insert` e `delete` hanno costo $O(\log n)$ nel caso pessimo con questa struttura dati, dobbiamo preoccuparci però di *mantenere l'albero bilanciato*
 
 ```
 function update-height(AVL T)
@@ -557,17 +557,17 @@ A seguito di un inserimento o di una rimozione possiamo avere l'Albero sbilancia
 
 Quindi nel caso dell'**inserimento** di un nodo:
 - Si inserisce come per un Albero BST 
-  - Costo: $O(\log{n})$
+  - Costo: $O(\log n)$
 - Si riaggiornano le altezze dei sotto-alberi
-  - Costo: $O(\log{n})$
+  - Costo: $O(\log n)$
 - Se è sbilanciato ($\beta(u) > 1$ o $\beta(u) < -1$) si ribilancia l'Albero
   - Costo: $O(1)$
 
 Quindi nel caso della **rimozione** di un nodo:
 - Si rimuove come per un Albero BST 
-  - Costo: $O(\log{n})$
+  - Costo: $O(\log n)$
 - Si riaggiornano le altezze dei sotto-alberi
-  - Costo: $O(\log{n})$
+  - Costo: $O(\log n)$
 - Se è sbilanciato ($\beta(u) > 1$ o $\beta(u) < -1$) si ribilancia l'Albero
   - Costo: $O(1)$
 
@@ -575,10 +575,10 @@ Quindi nel caso della **rimozione** di un nodo:
 ## Ricapitolando
 |                   | `SEARCH`     | `INSERT`     | `DELETE`     |
 | ---               | ---          | ---          | ---          |
-| Array Ordinato    | $O(\log{n})$ | $O(n)$       | $O(n)$       |
+| Array Ordinato    | $O(\log n)$ | $O(n)$       | $O(n)$       |
 | Liste Concatenate | $O(n)$       | $O(1)$       | $O(n)$       |
 | Alberi BST        | $O(h)$       | $O(h)$       | $O(h)$       |
-| Alberi AVL        | $O(\log{n})$ | $O(\log{n})$ | $O(\log{n})$ |
+| Alberi AVL        | $O(\log n)$ | $O(\log n)$ | $O(\log n)$ |
 
 # Tabelle Hash
 Struttura dati estremamente efficente per le operazioni basilari di un Dizionario
@@ -738,15 +738,182 @@ Dopo che avrò risolto i sottoproblemi l'array sarà già ordinato, non ci sarà
 
 Il costo di QuickSort dipende da `partition()`, che nel caso peggiore ha costo $\Theta(n^2)$
 
-Nel caso medio però si ha costo $\Theta(n \log{n})$, cosa che lo rende molto più veloce rispetto agli algoritmi visti in precedenza
+Nel caso medio però si ha costo $\Theta(n \log n)$, cosa che lo rende molto più veloce rispetto agli algoritmi visti in precedenza
 
 Per avere sempre un caso medio possiamo scegliere in maniera pseudo-casuale il pivot
 
 ## Merge Sort
 
-- Dividere A[] in due meta' A1[] e A2[]
-(senza permutare) di dimensioni uguali;
-- Applicare ricorsivamente Merge Sort a
-A1[] e A2[]
-- Fondere (merge) gli array ordinati A1[] e
-A2[] per ottenere l'array A[] ordinato
+- Dividere A[] in due meta' A1[] e A2[] (senza permutare) di dimensioni uguali
+- Applicare ricorsivamente Merge Sort a A1[] e A2[]
+- Fondere (merge) gli array ordinati A1[] e A2[] per ottenere l'array A[] ordinato
+
+Operazione `merge()` complessa:
+```
+private static void merge(Comparable A[], int i1, int f1, int f2)
+        {
+        Comparable[] X = new Comparable[f2 - i1 + 1];
+        int i = 0, i2 = f1 + 1, k = i1;
+        while (i1 <= f1 && i2 <= f2) {
+                if (A[i1].compareTo(A[i2]) < 0)
+                        X[i++] = A[i1++];
+                else
+                        X[i++] = A[i2++];
+        }
+        if (i1 <= f1)
+                for (int j = i1; j <= f1; j++, i++) X[i] = A[j];
+        else
+                for (int j = i2; j <= f2; j++, i++) X[i] = A[j];
+        for (int t = 0; k <= f2; k++, t++) A[k] = X[t];
+}
+```
+<img src="mergeMergeSort.png" alt="mergeMergeSort">
+
+Costo: $T(n) = 2T(n/2) + n = \Theta(n \log n)$
+
+Non dipende dalla configurazione iniziale, quindi il caso medio, ottimo e pessimo sono equivalenti
+
+Rispetto al QuickSort occupa più spazio, molto difficile da fare in loco
+
+## Heap Sort
+- Utilizzare una struttura dati detta heap per ordinare un array
+- Costo computazionale: $O(n log n)$
+- Ordinamento sul posto
+
+**Heap**: Alberi Binari "Quasi Completi" in cui il valore massimo è sempre la radice, inoltre è possibile salvarlo su un array per accesso in tempo $O(1)$
+
+Tutti i nodi sono spostati verso sinistra, come se riempissi l'albero con una visita in ampiezza
+
+**Array Heap**: Rappresentazione di un Albero Binario Heap tramite Array
+- Array `A` di lunghezza $\geq$ `A.heapsize`
+- `A[0]` vuoto
+- `A[1]` contiene la radice
+- `parent(i) = i/2`
+- `left(i) = 2*i`
+- `right(i) = 2*i + 1`
+
+Operazioni base:
+- `findMax()`: Restituisce il massimo
+  - Restituisce `A[1]`
+  - Costo: $\Theta(1)$
+- `fixHeap()`: Ripristina la proprietà di *max-heap*
+  - Confronto ricorsivamente `A[i]` con il massimo dei suoi figli e vedo se la proprietà è verificata, in caso contrario scambio i due elementi
+  - Costo: Al peggio il numero di scambi è uguale alla profondità dell'array, quindi $O(\log n)$
+- `heapify()`: Costruisce un *heap* a partire da un array non ordinato
+  - Ricorsivamente per `A[2*i]` e `A[2*i + 1]`, applicando `fixHeap()` volta per volta
+  - Costo: $T(n) = 2T(n/2) + \log n = O(n)$
+- `deleteMax()`: rimuovi l'elemento massimo da un *max-heap*, metto il valore più piccolo e applico `fixHeap()`
+  - Costo: come `fixHeap()`, $O(\log n)$
+
+**Heap Sort**: Costruisco un *max-heap* ed estraggo ogni volta il massimo togliendolo dal *max-heap* e restituisco l'array ordinato
+```
+public static void heapSort(Comparable S[]) {
+        heapify(S, S.length - 1, 1);
+        for (int c = (S.length - 1); c > 0; c--) {
+                Comparable k = findMax(S);
+                deleteMax(S, c);
+                S[c] = k;
+        }
+}
+```
+Costo totale: $O(n) + O(\displaystyle \sum_{c=n} ^{1} {\log c}) = O(n \log n)$
+
+---
+
+***Possibile fare meglio di $O(n \log n)$ con confronti? No***
+
+## Counting Sort
+- I valori dell'array appartengono ad un intervallo conosciuto `[0, k-1]`
+- Costruisco un array di dimensione `k` che per ogni volta che incontro il valore aggiorno un contatore all'indice corrispondente
+- Ricolloco i valori per il numero di volte trovati nell'array
+- Se i valori possibili sono $k = O(n)$ allora il costo è $O(n)$
+
+## Pigeonhole Sort (Bucket Sort)
+Se ciò che dobbiamo ordinare non sono numeri interi possiamo usare un array di liste concatenate al posto di un array di interi
+
+Se però il valore di `k` diventa troppo grande diventa ingestibile
+
+## Radix Sort
+Se però riusciamo a rendere Bucket Sort stabile possiamo ordinare a partire dalle cifre meno significative
+
+        DA FINIRE
+
+## Riassunto ordinamento
+<img src="conclusionSorting.png" alt="conclusionSorting">
+
+# Selezione del k-esimo minimo
+Per trovare il minimo di un array abbiamo $\Theta(n)$ confronti, se vogliamo trovare il k-esimo minimo invece?
+
+## Selection Sort incompleto
+```
+algorithm select(array A[1..n], int k) → elem
+        for i:=1 to k do
+                minIndex := i;
+                minValue := A[i];
+                for j:=i+1 to n do
+                        if (A[j] < minValue) then
+                                minIndex := j;
+                                minValue := A[j];
+                        endif
+                endfor
+                swap A[i] and A[minIndex];
+        endfor
+        return A[k];
+```
+Costo $\Theta(kn)$
+Efficente solo se `k << n`
+
+## Heap Select
+- Costruisco un *min-heap*
+  - Costo: $O(n)$
+- Estraggo per $k-1$ volte il minimo
+  - Costo: $O(k \log n)$
+- Il k-esimo minimo è l'elemento minimo che rimane
+
+Quindi il costo totale è $O(n + k \log n)$
+
+Anche qui rimane efficente solo se `k << n`
+
+Se $k = \Theta(n)$?
+
+## Quick Select
+Usa *Divide et Impera*, ma se una partizione è già abbastanza grande da contenere il k-esimo minimo voluto cerco solo in quella
+
+Costo caso pessimo: $\Theta(n^2)$
+Costo caso medio: $O(n)$
+
+# Code con priorità
+Struttura dati che contiene il minimo o il massimo in un insieme dinamico di chiavi
+
+Operazioni:
+- `findMin() → elem`
+  - Restituisce un elemento associato alla chiave minima
+  - Costo: $O(1)$
+- `insert(elem e, chiave k)`
+  - Inserisce un nuovo elemento e con associata la chiave `k`
+  - Costo: $O(\log_d n)$
+- `delete(elem e)`
+  - Rimuove un elemento dalla coda (si assume di avere accesso diretto a tale elemento `e`)
+  - Costo: $O(d \log_d n)$
+- `deleteMin()`
+  - Rimuove un elemento associato alla chiave minima
+  - Costo: $O(d \log_d n)$
+- `increaseKey(elem e, chiave c)`
+  - Incrementa la chiave dell'elemento `e` della quantità `c` (si assume di avere accesso diretto a tale elemento `e`)
+  - Costo: $O(d \log_d n)$
+- `decreaseKey(elem e, chiave c)`
+  - Decrementa la chiave dell'elemento `e` della quantità `c` (si assume di avere accesso diretto a tale elemento `e`)
+  - Costo: $O(\log_d n)$
+
+## d-heap
+Modifica alla struttura min/max-heap dell'algoritmo *Heap Sort*
+
+L'albero invece di essere binario è d-ario
+
+Un d-heap con $n$ nodi ha altezza $O(\log_d n)$
+
+### Memorizzazione d-heap in array
+- Radice in `A[1]`
+- Primo figlio in posizione $((i-1) \times d) + 2$
+- Ultimo figlio in posizione $(i \times d) + 1$
+
