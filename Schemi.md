@@ -319,7 +319,7 @@ Algoritmo ricorsivo per individuare la migliore mossa possibile in un gioco seco
 L'algoritmo è esatto quando è possibile visitare tutto il Game Tree
 
 ```
-function MiniMax(Tree T, bool playerA) → int
+function MiniMax(Tree T, bool playerA) -> int
         if isLeaf(T) then
                 eval = evaluate(T)
         else if playerA == true then                            MAX player
@@ -346,7 +346,7 @@ Ottimizzazione dell'algoritmo MiniMax
 Non è necessario infatti visitare tutto l'albero
 
 ```
-function AlphaBeta(Tree T, bool playerA, int α, int β) → int
+function AlphaBeta(Tree T, bool playerA, int α, int β) -> int
         if isLeaf(T) then
                 eval = evaluate(T)
         else if playerA == true then                            MAX player
@@ -372,7 +372,7 @@ Se il Game Tree è troppo grande limitiamo la ricerca ad un livello massimo di p
 
 In questo caso possiamo anche scegliere la mossa che ci porta alla vittoria prima
 ```
-function AlphaBetaDepth(Tree T, bool playerA, int α, int β, int depth) → int
+function AlphaBetaDepth(Tree T, bool playerA, int α, int β, int depth) -> int
         if depth == 0 or isLeaf(T) then
                 eval = evaluate(T, depth)
         else if playerA == true then                            MAX player
@@ -394,7 +394,7 @@ function AlphaBetaDepth(Tree T, bool playerA, int α, int β, int depth) → int
 
 ## IterativeDeepening
 ```
-function IterativeDeepening(Tree T, bool playerA, int depth) → int
+function IterativeDeepening(Tree T, bool playerA, int depth) -> int
         α = MinAlpha
         β = MaxBeta
         for d = 0, ..., depth do
@@ -434,7 +434,7 @@ Operazioni:
 
 ### Implementazione `insert`
 ```
-function insert(BST T, Key k, Data d) → BST
+function insert(BST T, Key k, Data d) -> BST
         N = new BST(k, d), P = NIL, S = T
         while S != NIL do                       Search position
                 P = S
@@ -451,7 +451,7 @@ function insert(BST T, Key k, Data d) → BST
 ```
 ### Implementazione `delete`
 ```
-function delete(BST T, Key k) → BST                             Returns the (new) root
+function delete(BST T, Key k) -> BST                             Returns the (new) root
         v = search(T, k)
         if v != NIL then
                 if v.left == NIL or v.right == NIL then         (1-2) Foglia da rimuovere o ha un singolo figlio
@@ -462,7 +462,7 @@ function delete(BST T, Key k) → BST                             Returns the (n
                         return deleteNode(T, u)
 
 
-function deleteNode(BST T, BST v) → BST
+function deleteNode(BST T, BST v) -> BST
         p = v.parent
         if p != NIL then                                                                v is not the root
                 if isLeaf(v) then                                                       (1) Foglia da rimuovere
@@ -505,7 +505,7 @@ function update-height(AVL T)
                         nh = max(lh, rh) + 1
                 T.height = nh
 
-function β(AVT T) → int
+function β(AVT T) -> int
         lh = rh = 0
         if T.left != NIL then
                 lh = T.left.height
@@ -526,7 +526,7 @@ Nota: Preserva le proprietà di ordine dei BST
 
 ### Rotazione a Destra 
 ```
-function rotateDX(AVL T , AVL u) → AVL
+function rotateDX(AVL T , AVL u) -> AVL
         if u != NIL and u.left != NIL then
                 v = u.left
                 v.parent = u.parent
@@ -846,7 +846,7 @@ Per trovare il minimo di un array abbiamo $\Theta(n)$ confronti, se vogliamo tro
 
 ## Selection Sort incompleto
 ```
-algorithm select(array A[1..n], int k) → elem
+algorithm select(array A[1..n], int k) -> elem
         for i:=1 to k do
                 minIndex := i;
                 minValue := A[i];
@@ -886,7 +886,7 @@ Costo caso medio: $O(n)$
 Struttura dati che contiene il minimo o il massimo in un insieme dinamico di chiavi
 
 Operazioni:
-- `findMin() → elem`
+- `findMin() -> elem`
   - Restituisce un elemento associato alla chiave minima
   - Costo: $O(1)$
 - `insert(elem e, chiave k)`
@@ -917,3 +917,97 @@ Un d-heap con $n$ nodi ha altezza $O(\log_d n)$
 - Primo figlio in posizione $((i-1) \times d) + 2$
 - Ultimo figlio in posizione $(i \times d) + 1$
 
+# Union Find
+Struttura dati per gestire *insiemi disgiunti* di oggetti
+
+Operazioni fondamentali:
+- `makeSet(elem x)`
+  - Crea un insieme il cui unico elemento e rappresentante è `x`
+  - `x` non deve appartenere ad un altro insieme esistente
+- `find(elem x) -> name`
+  - Restituisce il rappresentate dell'unico insieme contenente `x`
+- `union(name x, name y)`
+  - Unisce i due insiemi rappresentati da `x` e `y`
+
+## QuickFind
+- Ogni insieme viene rappresentato con un albero di altezza uno
+  - Le foglie dell'albero contengono gli elmenti dell'insieme, e la radice è il rappresentante
+  - Possibile rappresentarle con Liste
+
+<img src="quickFind.png" alt="quickFind">
+
+- `makeSet(elem x)`
+  - Crea un albero dove l'unica foglia è `x` e il rappresentante è `x` stesso
+  - Costo: $O(1)$
+- `find(elem x) -> name`
+  - Restituisce il puntantore al padre di `x`
+  - Costo: $O(1)$
+- `union(name x, name y)`
+  - Tutte le foglie del secondo albero vengono spostate nel primo
+  - Costo: $O(n)$
+
+## QuickUnion
+- Si rappresenta ogni insieme tramite un albero radicato generico
+- Ogni nodo dell'albero contiene l'oggetto e il puntatore al padre
+- La radice è il rappresentante
+- `makeSet(elem x)`
+  - Crea un albero con unico nodo `x`
+  - Costo: $O(1)$
+- `find(elem x) -> name`
+  - Risale la lista dei padri di `x` fino a trovare la radice
+  - Costo: $O(n)$
+- `union(name x, name y)`
+  - Appende un albero all'altro
+  - Costo: $O(1)$
+
+## Ottimizzazioni possibili
+### QuickFind con euristica sul peso
+Consiste nel tenere traccia della dimensione degli alberi e quando si vogliono unire due alberi "spostare" quello di dimensione minore
+
+Costo armortizzato di `union` con euristica sul peso: $O(\log n)$
+
+### QuickUnion con euristica sul rango
+Bisogna rendere la radice dell'albero più basso figlia della radice dell'albero più alto, in questo modo l'altezza rimane minima mantenendo il costo di `union` costante
+
+Costo medio di `find` con euristica sul rango: $O(\log n)$
+
+# Divide et Impera
+- ***Divide***: Dividi il problema in sotto-problemi indipendenti, di dimensioni “minori”
+- ***Impera***: Risolvi i sotto-problemi ricorsivamente
+- ***Combina***: Unisci le soluzioni dei sottoproblemi per costruire la soluzione del problema di partenza
+
+## Torri di Hanoi
+```
+        Hanoi(Stack p1, Stack p2, Stack p3, integer n)
+                if (n = 1) then
+                        p3.push(p1.pop())
+                else
+                        hanoi(p1, p3, p2, n-1)
+                        p3.push(p1.pop())
+                        hanoi(p2, p1, p3, n-1)
+        endif
+```
+Divide:
+- $n-1$ dischi da `p1` a `p2`
+- 1 disco da `p1` a `p3`
+- $n-1$ dischi da `p2` a `p3`
+
+## Ricerca del sottovettore massimo
+Esistono in un vettore di $n$ elementi $n(n+1)/2$ elementi
+
+Varie versioni:
+1) Confrontare tra loro tutti i $n^2$ sottovettori e trovare il massimo, ma il costo è cubico
+2) Un modo più furbo è quello di non fare tre for ma solo due, ciclando l'inizio $n$ volte e per ogni volta allungare il sottovettore
+3) Usare divide-et-impera
+
+### Sottovettore massimo con divide-et-impera
+- Dividiamo il vettore `A` in due parti `A[0..m], A[m], A[m+1..n-1]`, ho tre casi:
+  - Il sottovettore massimo si trova nella *prima metà*
+  - Il sottovettore massimo si trova nella *seconda metà*
+  - Il sottovettore massimo si trova *a cavallo* tra le due metà
+- Nel caso si trovi nella prima o nella seconda metà applico la ricorsione
+- Per il terzo caso cerco il sottovettore massimo adiacente ad `A[m]` sia a destra che a sinistra
+- Infine restituisco il massimo tra quelli che ho trovato per i tre casi
+- Costo: $O(n \log n$)
+
+# Greedy
