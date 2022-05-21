@@ -777,7 +777,7 @@ Rispetto al QuickSort occupa più spazio, molto difficile da fare in loco
 
 ## Heap Sort
 - Utilizzare una struttura dati detta heap per ordinare un array
-- Costo computazionale: $O(n log n)$
+- Costo computazionale: $O(n \log n)$
 - Ordinamento sul posto
 
 **Heap**: Alberi Binari "Quasi Completi" in cui il valore massimo è sempre la radice, inoltre è possibile salvarlo su un array per accesso in tempo $O(1)$
