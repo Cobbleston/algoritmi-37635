@@ -1035,4 +1035,516 @@ Si differenzia da Divide et Impera perchè segue un approccio bottom-up
 
         INSERIRE PROBLEMI NOTI ED ESEMPI
 
+# Grafi
+Problemi sui Grafi
+- Visite
+  - Visite in ampiezza (Cammini Minimi da Singola Sorgente)
+  - Visite in profondità (Ordinamento topologico e Componenti Fortemente Connesse)
+- Alberi di Copertura Minimi (MST)
+- Cammini Minimi
+  - Da singola sorgente
+  - Tra tutte le coppie di vertici
+
+## Definizioni
+
+Un grafo **orientato** $G$ è una coppia $(V, E)$ dove:
+- Insieme finito di *vertici* $V$
+- Insieme di *archi* $E$: relazione binaria tra vertici
+
+Un grafo **non orientato** $G$ è una coppia $(V, E)$ dove:
+- Insieme finito di *vertici* $V$
+- Insieme di *archi* $E$: coppie non ordinate
+
+L'arco $(v, w)$ è **incidente** da $v$ in $w$
+
+Un vertice $w$ è **adiacente** a $v$ se e solo se $(v, w) \in E$
+
+Il **grado** di un vertice è il numero di archi che partono da esso
+
+In un grafo orientato il **grado entrante (uscente)** di un vertice è il numero di archi incidenti in (da) esso, il suo **grado** totale è la somma di quello entrante e di quello uscente
+
+La struttura dati deve supportare le seguenti operazioni:
+- `NumVertici() -> intero`
+- `NumArchi() -> intero`
+- `grado(vertice v) -> intero`
+- `archiIncidenti(vertice v) -> (arco, arco, ..., arco)`
+- `estremi(arco e) -> (vertice, vertice)`
+- `opposto(vertice x, arco e) -> vertice`
+- `sonoAdiacenti(vertice x, vertice y) -> booleano`
+- `aggiungiVertice(vertice v)`
+- `aggiungiArco(vertice x, vertice y)`
+- `rimuoviVertice(vertice v)`
+- `rimuoviArco(arco e)`
+
+## Implementazione con Liste di incidenza (Grafo non orientato)
+Array per tutti i vertici, ogni cella dell'array indica gli archi a qui il vertice è incidente
+
+Considerando $n = |V|, m = |E|, \delta(x) = \text{grado di }x$
+
+- `grado(vertice v) -> intero`
+  - Costo: $O(\delta(v))$
+- `archiIncidenti(vertice v) -> (arco, arco, ..., arco)`
+  - Costo: $O(\delta(v))$
+- `sonoAdiacenti(vertice x, vertice y) -> booleano`
+  - Costo: $O(min\{\delta(x), \delta(y)\})$
+- `aggiungiVertice(vertice v)`
+  - Costo: $O(1)$
+- `aggiungiArco(vertice x, vertice y)`
+  - Costo: $O(1)$
+- `rimuoviVertice(vertice v)`
+  - Costo: $O(m)$
+- `rimuoviArco(arco e)`
+  - Costo: $O(\delta(x) + \delta(y))$
+
+## Implementazione con Matrice di adiacenza (Grafo non orientato)
+Matrice $|V| \times |V|$ per indicare se il l'arco $(x, y)$ esiste
+
+Considerando $n = |V|, m = |E|, \delta(x) = \text{grado di }x$
+
+- `grado(vertice v) -> intero`
+  - Costo: $O(n)$
+- `archiIncidenti(vertice v) -> (arco, arco, ..., arco)`
+  - Costo: $O(n)$
+- `sonoAdiacenti(vertice x, vertice y) -> booleano`
+  - Costo: $O(1)$
+- `aggiungiVertice(vertice v)`
+  - Costo: $O(n^2)$
+- `aggiungiArco(vertice x, vertice y)`
+  - Costo: $O(1)$
+- `rimuoviVertice(vertice v)`
+  - Costo: $O(n^2)$
+- `rimuoviArco(arco e)`
+  - Costo: $O(1)$
+
+Nel caso il Grafo sia orientato avremo semplicemente una tabella non simmetrica lungo la diagonale
+
+Analogo per i Grafi Pesati
+
+## Cammini
+
+Un **cammino** in $G=(V, E)$ è una sequenza di vertici $<w_0, w_1, \dots, w_k>$ tale che $\{w_i, w_{i+1}\} \in E$ per $0 \leq i \leq k-1$
+
+La **lunghezza** del cammino è il numero di archi attraversati
+
+Un cammino si dice **semplice** se tutti i suoi vertici sono distinti
+
+Se esiste un cammino $c$ tra i vertici $v$ e $w$, si dice che $w$ è raggiungibile da $v$ tramite $c$
+
+Se $G$ è un grafo *non orientato*, diciamo che è **connesso** se esiste un cammino da ogni vertice ad ogni altro vertice
+
+Se $G$ è un grafo *orientato*, diciamo che è **fortemente connesso** se esiste un cammino da ogni vertice ad ogni altro vertice
+
+Se $G$ è un grafo *orientato*, il grafo ottenuto ignorando la direzione degli archi e dei cappi è detto **versione non orientata** di $G$
+
+Se $G$ è un grafo *non orientato*, il grafo ottenuto inserendo due archi orientati opposti per ogni arco non ordientato del grafo è detto **versione orientata** di $G$
+
+Se un grafo $G$ *orientato* non è fortemente connesso, ma la sua versione non orientata è connessa, diciamo che $G$ è **debolmente connesso**
+
+Un **ciclo** è un cammino di lunghezza $\geq 1$ tale che la sorgente e l'arrivo sono lo stesso vertice
+
+In grafi non ordientati, un ciclo di lunghezza $2$ è detto **banale**
+
+Un ciclo è **semplice** se i nodi del cammino sono tutti distinti
+
+Un grafo **aciclico** è un grafo senza cicli (escludendo quelli banali)
+
+Un grafo **non orientato completo** è un grafo che ha un arco tra ogni coppia di vertici
+
+Un **albero libero** è un grafo non orientato connesso aciclico, se un vertice è una radice otteniamo un **albero radicato**
+
+# Algoritmi di Visita dei Grafi
+Vogliamo dato un grafo $G = (V, E)$ e un vertice $s \in V$ detto *sorgente* visitare ogni vertice raggiungibile nel grafo dal vertice $s$, visitando ogni nodo una sola volta
+
+Possibile una **visita di ampiezza** (BFS)
+- Visita i nodi espandendo la frontiera tra nodi scoperti / da scoprire
+
+E una **visita in profondità** (DFS)
+- Visita i nodi andando il più lontano possibile nel grafo
+
+## Visita in Ampiezza (BFS)
+- L'algoritmoo esplora il grafo a partire da un nodo $s$ e costruisce l'albero $T$ radicato in $s$ contenente tutti i nodi raggiungibili da esso
+- Ogni vertice del grafo può essere:
+  - inesplorato: il vertice non è stato ancora incontrato
+  - aperto: già incontrato ma non ho esplorato tutti gli archi
+  - chiuso: il vertice è stato visitato completamente
+- L'algoritmo mantiene un sottoinsieme $F \subseteq T$
+  - Se un nodo $v$ sta in $T-F$, significa che $v$ è chiuso
+  - Se sta in $F$ allora è aperto
+  - Se non sta in $T$ allora è inesplorato
+
+```
+algoritmo visitaBFS(G, s) -> albero
+        for each v in V do
+                v.mark = false
+        T = s
+        F = neq Queue()
+        F.enqueue(s)
+        s.mark = true
+        s.dist = 0
+        while (F non vuoto) do
+                u = F.dequeue()
+                "visita il vertice u"
+                for each v adiacente a u do
+                        if (not v.mark) then
+                                v.mark = true
+                                v.dist = u.dist + 1
+                                F.enqueue(v)
+                                v.parent = u
+                        endif
+                endfor
+        endwhile
+        return T
+```
+- Insieme $F$ gestito tramite una coda
+- `v.mark` è la marcatura del nodo $v$
+- `v.dist` è la distanza del nodo $v$ dal vertice $s$
+- Costo, considerando $n$ come numero dei vertici e $m$ come numero degli archi:
+  - $O(n+m)$ con liste di adiacenza
+  - $O(n^2)$ con matrice di adiacenza
+
+L'algoritmo di visita BFS può essere usato per ottenere il percorso più breve tra due vertici
+
+## Visita in profondità (DFS)
+Viene utilizzata per coprire l'intero grafo, non solo i nodi raggiungibili da singola sorgente
+
+Restituiamo quindi una foresta, un insieme di alberi, e per ogni nodo calcoleremo il tempo di scoperta e il tempo di "terminazione" di esso
+
+```
+global time = 0
+
+algoritmo DFS(Grafo G)
+        for each u in V do
+                u.mark = white
+                u.parent = nil
+        endfor
+        for each u in V do
+                if (u.mark == white) then
+                        DFS-visit(u)
+                endif
+        endfor
+
+algoritmo DFS-visit(vertice u)
+        u.mark = gray
+        time = time + 1
+        u.dt = time
+        for each v adiacente a u do
+                if (v.mark = white) then
+                        v.parent = u
+                        DFS-visit(v)
+                endif
+        endfor
+        "visita il vertice u"
+        time = time + 1
+        u.ft = time
+        u.mark = black
+
+```
+- Nodi bianchi = inesplorati
+- Nodi grigi = aperti
+- Nodi neri = chiusi
+- `v.dt`: discovery time
+- `v.ft`: finish time
+
+La Foresta $DF$ contiene più alberi, e ogni nodo ha l'informazione sul discovery e finish time
+- Se $[u.dt, u.ft]$ e $[v.dt, v.ft]$ sono disgiunti allora $u$ e $v$ non sono discendenti
+- Se $[u.dt, u.ft]$ è interamente contenuto in $[v.dt, v.ft]$ sono disgiunti allora $u$ è discendente di $v$ in un albero di $DF$
+- Se $[v.dt, v.ft]$ è interamente contenuto in $[u.dt, u.ft]$ sono disgiunti allora $v$ è discendente di $u$ in un albero di $DF$
+
+Nei grafi orientati abbiamo più informazioni
+- Se $v.dt < u.dt$ e $u.ft < v.ft$ l'arco $(u, v)$ è **all'indietro**
+- Se $u.dt < v.dt$ e $v.ft < u.ft$ l'arco $(u, v)$ è **in avanti**
+- Se $v.ft < u.dt$ l'arco $(u, v)$ è di **attraversamento a sinistra**
+
+Per verificare che un grafo sia un DAG (Direct Acyclic Graph) basta verificare che non ci siano archi all'indietro dopo una visita di profondità
+
+Un **Ordinamento Topologico** di un DAG è un ordinamento lineare dei suoi vertici tale per cui gli archi "vanno tutti a destra"
+- Nota: non è unico
+- Dopo una DFS si restituiscono i vertici in ordine di finish time *decrescente*
+
+# Minimum Spanning Tree (MST)
+Determinare come interconnettere diversi elementi tra loro minimizzando certi vincoli sulle connessioni
+
+L'albero di copertura minimo (MST) non è sempre unico
+
+Usiamo un approccio Greedy:
+- Accresciamo un sottoinsieme $T$ di archi tal che $T$ sia un sottoinsieme di un qualche albero di copertura minimo
+- Un arco $(u, v)$ è detto *sicuro* per $T$ se $T \cup (u, v)$ è ancora un sottoinsieme di qualche MST
+
+### Regola del taglio
+Scegli un taglio in $G$ che rispetta gli archi già colorati di blu (non passi dai blu). Tra tutti gli archi non colorati che attraversano il taglio seleziona quello con peso minimo e coloralo di blu
+
+### Regola del ciclo
+Scegli un ciclo semplice in $G$ che non contenga archi rossi, tra tutti gli archi non colorati seleziona un arco di costo massimoe e coloralo di rosso
+
+Si può costruire un MST applicando in successione una di queste due regole (quando applicabile)
+
+## Algoritmo di Kruskal
+Kruskal fissa un ordine di applicazione delle due regole
+- Ingrandiamo sottoinsiemi disgiunti di un albero di copertura minimo connettendoli tra loro fino ad avere l'albero finale
+- Si considerano gli archi in ordine decrescente di peso
+  - Se un arco collega due nodi già collegati tra loro dal MST provvisorio lo coloriamo di rosso
+- Ad ogni passo quindi si aggiunge alla foresta un arco di peso minimo
+- Per sapere se i due vertici di un arco sono già collegati tra loro possiamo usare **UnionFind**
+
+```
+Tree Kruskal-MST(Grafo G=(V, E, w))
+        UnionFind UF
+        Tree T = albero vuoto
+        for i = 1 to G.numNodi() do
+                UF.makeSet(i)
+        sort(E, w)              // Ordina gli archi di E per il peso w crescente
+        for each (u, v) in E do
+                Tu = UF.find(u)
+                Tv = UF.find(v)
+                if (Tu != Tv) then              // evita i cicli
+                        T = T + (u, v)          // aggiungi arco
+                        UF.union(Tu, Tv)        // unisci componenti
+                endif
+        endfor
+        return T
+```
+Costo usando *QuickUnion con euristica sul rango*: $n \times O(1) + O(m \log m) + m * O(2 \times T_{find} + T_{union}) = O(n) + O(m \log n) + O(m \log n) = O(m \log n)$
+
+## Algoritmo di Prim
+Utilizza solo la regola del taglio
+- Si procede mantenendo un singolo albero $T$ che viene fatto crescere via via
+- Si parte dalla radice e si interrompe quando tutti i vertici sono stati raggiunti
+- Ad ogni passo viene aggiunto l'arco di peso minimo che collega un nodo già raggiungo ad uno non ancora raggiunto
+
+```
+integer[] Prim-MST(Grafo G=(V,E,w), nodo s)
+        double d[1..n]
+        integer p[1..n]
+        boolean b[1..n]
+        for v = 1 to n do                       // Inizializzazione
+                d[v] = ∞
+                p[v] = -1
+                b[v] = false
+        endfor
+        d[s] = 0                        // Primo nodo (sorgente)
+        CodaPriorita<integer, double> Q
+        Q.insert(s, d[s])
+        while (not Q.isEmpty()) do
+                u = Q.find()
+                Q.deleteMin()                   // n deleteMin()
+                b[u] = true
+                for each (v adiacente a u t.c. not b[v]) do
+                        if (d[v] == ∞) then
+                                Q.insert(v, w(u,v))             // n insert(), inclusa la prima
+                                d[v] = w(u,v)
+                                p[v] = u
+                        else if (w(u,v) < d[v]) then
+                                Q.decreaseKey(v, d[v]-w(u,v))   // O(m) decreaseKey()
+                                d[v] = w(u,v)
+                                p[v] = u
+                        endif
+                endfor
+        endwhile
+return p
+```
+Costo usando una coda con priorità basata su min-heap
+- $n$ `deleteMin()` costano $O(n \log n)$
+- $n$ `insert()` costano $O(n \log n)$
+- $O(m)$ `decreaseKey()` costano $O(m \log n)$
+Totale: $O(n \log n + n \log n + m \log n) = O(m \log n)$
+
+# Cammini minimi
+Problema differente dalla ricerca del MST
+
+Qui cerchiamo un singolo cammino minimo da una sorgente ad un arrivo, e questo può non essere presente nel MST
+
+Ci sono diverse formulazioni del problema
+1. Ricerca del costo minimo tra una coppia di nodi $u$ e $v$
+2. Single-source shortest path
+   - Determinare cammini di costo minimo dalla sorgente $s$ a tutti gli altri nodi $u$ del grafo 
+3. All-pairs shortest paths
+   - Determinare cammini di costo minimo per ogni coppia di nodi $u$ e $v$
+
+Non è noto alcun algoritmo che risolve il problema (1) e non il problema (2)
+
+## Osservazioni
+Non esiste un cammino di costo minimo quando:
+- La destinazione non è raggiungibile
+- Esistono cicli di costo negativo
+
+## Albero dei cammini di costo minimo
+Sia $s$ un vertice di un grafo orientato pesato $G = (V, E)$. Allora esiste un albero $T$ che contiene i vertici raggiungiblili da $s$ tale che *ogni cammino* in $T$ sia un cammino *di costo minimo*
+
+Entrambi gli algoritmi che vediamo restituiscono un albero come quello descritto sopra, quindi oltre a sapere il costo del cammino minimo sapremo anche trovare il cammino minimo stesso
+
+La **distanza** $d_{xy}$ tra due nodi $x$ e $y$ il costo del cammino minimo che li connette, se non sono connessi la distanza è $+\infty$
+- $d_{vv} = 0, \forall v$
+- $d_{xz} \leq d_{xy} + d_{yz}$
+
+## Condizione di Bellman
+Per ogni arco $(u, v)$ e per ogni vertice $s$
+$$d_{sv} \leq d_{su} + w(u, v)$$
+
+Per la condizione di Bellman si può dedurre che l'arco $(u, v)$ fa parte di un cammino di costo minimo se e solo se
+$$d_{sv} = d_{su} + w(u, v)$$
+
+### Tecnica del rilassamento
+- Supponiamo di mantenere una stia $D_{sv} \geq d_{sv}$ della lunghezza del cammino di costo minimo tra $s$ e $v$
+- Effettuiamo dei passi di "rilassamento", riducendo progressivamente la stima finchè si ha $D_{sv} = d_{sv}$
+```
+if (D_su + w(u, v) < D_sv) then D_sv = D_su + w(u, v)
+```
+
+## Algoritmo di Bellman e Ford
+Partendo da una stima del costo del cammino di costo minimo ($+\infty$) effettuiamo passi di rilassamento fino ad aver raggiunto l'arrivo
+
+Ad ogni passo consideriamo tutti gli $m$ archi del grafo ed effettuaimo il passo di rilassamento, dopo $n-1$ iterazioni siamo sicuri di aver calcolato tutti i valori $D_{s v_k}$ corretti
+
+```
+double [1..n] BellmanFord (Grafo G=(V, E, w), int s)
+        int n = G.numNodi()
+        int pred[1..n], u, v
+        double D[1..n]
+        for v = 1 to n do       //inizializzo D e pred
+                D[v] = +inf
+                pred[v] = -1
+        endfor
+        D[s] = 0
+        for i = 1 to n-1 do
+                for each (u, v) in E do                 // Per ogni arco (lo faccio n-1 volte)
+                        if (D[u] + w(u, v) < D[v]) then         // Rilassamento?
+                                D[v] = D[u] + w(u, v)
+                                pred[v] = u
+                        endif
+                endfor
+        endfor
         
+        // Eventuale controllo per cicli negativi
+        for each (u, v) in E do
+                if (D[u] + w(u, v) < D[v]) then                         // Se posso rilassare ancora
+                        error "Il grafo contiene cicli negativi"
+                endif
+        endfor
+
+        return D
+```
+- I nodi del grafo sono identificati da degli interi
+- `D[v]` è la stima della distanza del nodo `v` alla sorgente `s`
+- `pred[v]` è il predecessore del nodo `v` sul cammino di costo minimo che collega `s` con `v`
+
+Costo $O(nm)$
+
+## Algoritmo di Dijkstra
+Determina i cammini di costo minimo da singola sorgente nel caso in cui tutti gli archi abbiamo costo $\geq 0$
+
+### Lemma Dijkstra
+Sia $G = (V, E, w)$ un grafo orientato con costi degli archi positivi
+
+$T$ rappresenta porzioni di cammini di costo minimo che partono da $s$
+
+L'arco $(u, v)$ con $u \in V(T)$ e $v \not \in V(T)$ che minimizza la quantità $d_{su} + w(u, v)$ appartiene ad un cammino minimo da $s$ a $v$
+
+Versione generica:
+```
+double [1..n] DijkstraGenerico (Grafo G=(V, E, w), int s)
+        int n = G.numNodi()
+        int pred[1..n], u, v
+        double D[1..n]
+        for v = 1 to n do       //inizializzo D e pred
+                D[v] = +inf
+                pred[v] = -1
+        endfor
+        D[s] = 0
+        while (non ho visitato tutti i nodi raggiungibili da s) do
+                Trova l'arco (u, v) incidente su T con D[u] + w(u, v) minimo
+                D[v] = D[u] + w(u, v)
+                pred[v] = u
+        endwhile
+        return D
+```
+
+Implementiamo la versione effettiva con le **Priority Queue**
+```
+double [1..n] Dijkstra (Grafo G=(V, E, w), int s)
+        int n = G.numNodi()
+        int pred[1..n], u, v
+        double D[1..n]
+        for v = 1 to n do       //inizializzo D e pred
+                D[v] = +inf
+                pred[v] = -1
+        endfor
+        D[s] = 0
+        CodaPriorita<int, double> Q
+        Q.insert(s, D[s])
+        while (not Q.isEmpty()) do
+                u = Q.find()                    // Trova e rimuovi il nodo con distanza minima
+                Q.deleteMin()
+                for each v adiacente a u do
+                        if (D[v] == +inf) then
+                                D[v] = D[u] + w(u, v)
+                                Q.insert(v, D[v])               // Simile a Prim (MST), ma con priorità diversa
+                                pred[v] = u
+                        else if (D[u] + w(u, v) < D[v]) then
+                                Q.decreaseKey(v, D[v] - D[u] - w(u, v))         // Rendi D[u] + w(u, v) la nuova distanza di v da s
+                                D[v] = D[u] + w(u, v)
+                                pred[v] = u
+                        endif
+                endfor
+        endwhile
+        return D
+```
+- L'inizializzazione ha costo $O(n)$
+- `find()` ha costo $O(1)$, `deleteMin()` ha costo $O(\log n)$ e sono eseguite al più $n$ volte
+  - Una volta che un nodo è stato estratto non verrà più reinserito
+- `insert()` e `decreaseKey()` hanno costo $O(\log n)$ e sono eseguite al più $m$ volte
+  - Ovvero una volta per ogni arco
+
+### Costo finale:
+$$T(n, m) = O((n+m) \log n) = O(m \log n)$$
+
+## Algoritmo di Floyd e Warshall
+Si può applicare a grafi orientati con costi anche negativi, purchè non ci siano cicli negativi
+
+È basato sulla programmazione dinamica e cerca i cammini minimi per ogni coppia di vertici
+
+```
+double[1..n, 1..n] FloydWarshall (G=(V, E, w))
+        int n = G.numNodi()
+        double D[1..n, 1..n, 0..n]
+        int x, y, k
+        for x = 1 to n do                               // Casi base della prima matrice ad indice k = 0
+                for y = 1 to n do
+                        if (x == y) then
+                                D[x, y, 0] = 0
+                        else if ((x, y) in E) then
+                                D[x, y, 0] = w(x, y)
+                        else
+                                D[x, y, 0] = +inf
+                        endif
+                endfor
+        endfor
+        for k = 1 to n do
+                for x = 1 to n do
+                        for y = 1 to n do
+                                D[x, y, k] = D[x, y, k - 1]                             //                        Distanza xy al passo k
+                                if (D[x, k, k - 1] + D[k, y, k - 1] < D[x, y, k]) then  //                                   =
+                                        D[x, y, k] = D[x, k, k - 1] + D[k, y, k - 1]    // min{distanza xy passo k-1, distanza xk passo k-1 + distanza ky passo k-1}
+                                endif
+                        endfor
+                endfor
+        endfor
+
+        // eventuale controllo per cicli negativi
+        for x = 1 to n do
+                if (D[x, x, n] < 0) then
+                        error "Il grafo contiene cicli negativi"
+                endif
+        endfor
+
+        return D[1..n, 1..n, n]
+```
+Costo: tempo $O(n^3)$, spazio $O(n^3)$
+
+Possibile ottimizzazione: servono solamente le matrici degli ultimi due passi, il corrente e quello precedente, quindi possiamo salvare solo quelle <br>
+In questo modo il costo in spazio diventa $O(n^2)$
+
+Oppure possiamo tenerne anche solo una, ma è più complesso
+
+Per ricostruire i cammini possiamo usare una matrice dei successori `next[x, y]` dove salviamo l'indice del secondo nodo del cammino x -> y
+
+Al termine dell'algoritmo stampiamo i nodi che vanno da `x` a `y` in ordine di attraversamento
