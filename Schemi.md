@@ -1011,3 +1011,28 @@ Varie versioni:
 - Costo: $O(n \log n)$
 
 # Greedy
+Ricerca della soluzione *golosa*, si passa ad un problema più semplice senza tornare mai sui propri passi
+
+Svantaggi:
+- Non sempre applicabile
+- Non sempre soluzione ottima
+
+Vantaggi:
+- Molto intuitiva
+
+        INSERIRE PROBLEMI NOTI ED ESEMPI
+
+# Programmazione dinamica
+Suddivisione del problema in sottoproblemi più semplici risolvibili in modo efficace conoscendo la soluzione di sottoproblemi precedenti
+
+Si differenzia da Divide et Impera perchè segue un approccio bottom-up
+
+- Definizione dei sottoproblemi
+- Definizione delle soluzioni ai sottoproblemi
+- Quale sottoproblema restituisce la soluzione al problema originale?
+
+...
+
+        INSERIRE PROBLEMI NOTI ED ESEMPI
+
+        
